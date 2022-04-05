@@ -1,0 +1,17 @@
+{% if show_author %}
+  <li>
+      Автор: {{ post.author.get_full_name }}
+      <a href="{% url 'posts:profile' post.author.get_username %}">все посты пользователя</a>
+  </li>
+{% endif %}
+{% if show_post_detail and not show_group %}
+  <a href="{% url 'posts:post_detail' post.pk %}">подробная информация</a>
+{% endif %}
+{% if show_group and post.group and not show_post_detail %}
+  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+{% endif %}
+{% if show_group and post.group and show_post_detail %}
+  <a href="{% url 'posts:post_detail' post.pk %}">подробная информация</a>
+  <br>
+  <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+{% endif %}
