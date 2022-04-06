@@ -73,20 +73,28 @@ class TaskCreateFormTests(TestCase):
                 group=self.group,
             ).exists()
         )
-    
+
     def test_create_and_edit_for_guest(self):
         self.guest_client = Client()
         response = self.guest_client.post(
             reverse('posts:post_create'),
             follow=True
         )
-        self.assertRedirects(response, reverse('users:login') + '?next=' + reverse('posts:post_create'))
+        self.assertRedirects(
+            response,
+            reverse('users:login') + '?next=' + reverse('posts:post_create')
+        )
         response = self.guest_client.post(
             reverse('posts:post_edit', kwargs={'post_id': f'{self.post.id}'}),
             follow=True
         )
-        self.assertRedirects(response, reverse('users:login') + '?next=' + reverse('posts:post_edit', kwargs={'post_id': f'{self.post.id}'}))
-    
+        self.assertRedirects(
+            response,
+            reverse('users:login')
+            + '?next='
+            + reverse('posts:post_edit', kwargs={'post_id': f'{self.post.id}'})
+        )
+
     def test_edit_not_your_post(self):
         self.new_user = User.objects.create_user(username='NewName')
         self.new_post = Post.objects.create(
@@ -94,7 +102,12 @@ class TaskCreateFormTests(TestCase):
             text='Тестовый текст поста',
         )
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': f'{self.new_post.id}'}),
+            reverse(
+                'posts:post_edit',
+                kwargs={'post_id': f'{self.new_post.id}'}
+            ),
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': self.new_post.id}))
+        self.assertRedirects(
+            response,
+            reverse('posts:post_detail', kwargs={'post_id': self.new_post.id}))

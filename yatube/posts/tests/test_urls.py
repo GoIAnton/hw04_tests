@@ -65,8 +65,10 @@ class TaskURLTests(TestCase):
         for address in urls:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
-                self.assertRedirects(response, reverse('users:login') + f'?next={address}')
-
+                self.assertRedirects(
+                    response,
+                    reverse('users:login') + f'?next={address}'
+                )
 
     def test_unexisting_page(self):
         response = self.guest_client.get('/unexisting_page/')
