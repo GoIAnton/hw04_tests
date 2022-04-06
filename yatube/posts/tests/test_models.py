@@ -13,7 +13,7 @@ class TaskModelTest(TestCase):
         cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
             title='Тестовая группа',
-            slug='Тестовый слаг',
+            slug='group',
             description='Тестовое описание',
         )
         cls.post = Post.objects.create(
@@ -23,9 +23,9 @@ class TaskModelTest(TestCase):
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        post = TaskModelTest.post.__str__()
-        post_str = 'Тестовый текст '
-        group = TaskModelTest.group.__str__()
-        group_str = 'Тестовая группа'
+        post = str(self.post)
+        post_str = self.post.text[:15]
+        group = str(self.group)
+        group_str = self.group.title
         self.assertEqual(group, group_str)
         self.assertEqual(post, post_str)
