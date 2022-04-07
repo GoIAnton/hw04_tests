@@ -21,10 +21,6 @@ class TaskURLTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый текст поста',
-        )
-        cls.post_with_group = Post.objects.create(
-            author=cls.user,
-            text='Тестовый текст поста',
             group=cls.group1
         )
 
@@ -55,7 +51,7 @@ class TaskURLTests(TestCase):
         pages_names = [
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group1.slug}),
-            reverse('posts:profile', kwargs={'username': self.post.id}),
+            reverse('posts:profile', kwargs={'username': self.user.username}),
         ]
         for reverse_name in pages_names:
             with self.subTest(reverse_name=reverse_name):
@@ -110,6 +106,8 @@ class TaskURLTests(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertEqual(len(response.context['page_obj']), 10)
+                response = self.authorized_client.get(reverse_name + "?page=2")
+                self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_post_with_group1(self):
         pages_names = [
@@ -121,14 +119,21 @@ class TaskURLTests(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertIn(
-                    self.post_with_group,
+                    self.post,
                     response.context['page_obj']
                 )
 
     def test_post_with_group1_in_group2(self):
-        self.group2 = Group.objects.create(
+        group2 = Group.objects.create(
             title='Группа2',
             slug='group2',
             description='Тестовое описание',
         )
-        self.assertFalse(self.group2.posts.all())
+        response = self.authorized_client.get(reverse(
+            'posts:group_list',
+            kwargs={'slug': group2.slug},
+        ))
+        self.assertNotIn(
+            self.post,
+            response.context['page_obj'],
+        )
